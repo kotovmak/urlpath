@@ -25,7 +25,7 @@ func Unmarshal(urlpath string, out interface{}) error {
 		return errors.New("value for unmarshaling is not of struct kind")
 	}
 
-	args, err := parse(urlpath)
+	args, err := parse(strings.TrimPrefix(urlpath, "/"))
 	if err != nil {
 		return err
 	}
@@ -66,11 +66,14 @@ func decode(args map[string]string, v reflect.Value) error {
 
 		if value == "" {
 			value = tag.defaultValue
+			if value == "" {
+				continue
+			}
 		}
 
 		err := decodeField(v.Field(i), value)
 		if err != nil {
-			return newError(InvalidFormatError, fmt.Errorf("decode value of fields %s failed: %v", tag.name, err))
+			return newError(InvalidFormatError, fmt.Errorf("decode value of field %s failed: %v", tag.name, err))
 		}
 	}
 	return nil
@@ -80,6 +83,13 @@ func decodeField(v reflect.Value, value string) error {
 	unmarshaler, ok := v.Interface().(Unmarshaler)
 	if ok {
 		return unmarshaler.UnmarshalURLValue(value)
+	}
+
+	if v.CanAddr() {
+		unmarshaler, ok = v.Addr().Interface().(Unmarshaler)
+		if ok {
+			return unmarshaler.UnmarshalURLValue(value)
+		}
 	}
 
 	switch v.Kind() {

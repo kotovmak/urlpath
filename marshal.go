@@ -26,6 +26,10 @@ func encode(v reflect.Value) (string, error) {
 			continue
 		}
 
+		if v.Field(i).IsZero() && tag.omitempty {
+			continue
+		}
+
 		value, err := encodeField(v.Field(i))
 		if err != nil {
 			return "", fmt.Errorf("encode field %s failed: %v", tag.name, err)
@@ -33,6 +37,9 @@ func encode(v reflect.Value) (string, error) {
 
 		if value == "" {
 			value = tag.defaultValue
+			if value == "" {
+				continue
+			}
 		}
 
 		elems = append(elems, tag.name)
