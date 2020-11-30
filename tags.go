@@ -5,15 +5,6 @@ import (
 	"strings"
 )
 
-/*
-	Tag options:
-	1) Field int `urlpath:"-"` - expilicit ignore field for marshal/unmarshal
-	2) Field int `urlpath:"name"` - appears in path as key `name`
-	3) Field int `urlpath:"name;required"` -
-	4) Field int `urlpath:"name;omitempty"` -
-	5) Field int `urlpath:"name;default=12345` -
-*/
-
 type tags struct {
 	ignore       bool
 	required     bool
