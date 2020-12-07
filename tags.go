@@ -5,6 +5,29 @@ import (
 	"strings"
 )
 
+type field struct {
+	tags
+	reflect.Value
+}
+
+func parseFields(v reflect.Value) []field {
+	elems := []field{}
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).Kind() == reflect.Struct && v.Type().Field(i).Anonymous {
+			elems = append(elems, parseFields(v.Field(i))...)
+			continue
+		}
+
+		tags := parseTag(v.Type().Field(i))
+		if tags.ignore || (v.Field(i).IsZero() && tags.omitempty) {
+			continue
+		}
+
+		elems = append(elems, field{tags, v.Field(i)})
+	}
+	return elems
+}
+
 type tags struct {
 	ignore       bool
 	required     bool

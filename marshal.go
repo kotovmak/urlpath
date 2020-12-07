@@ -19,33 +19,25 @@ func Marshal(v interface{}) (string, error) {
 }
 
 func encode(v reflect.Value) (string, error) {
-	elems := make([]string, 0, v.NumField())
-	for i := 0; i < v.NumField(); i++ {
-		tag := parseTag(v.Type().Field(i))
-		if tag.ignore {
-			continue
-		}
+	var sb strings.Builder
 
-		if v.Field(i).IsZero() && tag.omitempty {
-			continue
-		}
-
-		value, err := encodeField(v.Field(i))
+	fields := parseFields(v)
+	for _, field := range fields {
+		value, err := encodeField(field.Value)
 		if err != nil {
-			return "", fmt.Errorf("encode field %s failed: %v", tag.name, err)
+			return "", fmt.Errorf("encode field %s failed: %v", field.tags.name, err)
 		}
 
 		if value == "" {
-			value = tag.defaultValue
+			value = field.tags.defaultValue
 			if value == "" {
 				continue
 			}
 		}
 
-		elems = append(elems, tag.name)
-		elems = append(elems, value)
+		sb.WriteString("/" + field.tags.name + "/" + value)
 	}
-	return "/" + strings.Join(elems, "/"), nil
+	return sb.String(), nil
 }
 
 func encodeField(v reflect.Value) (string, error) {

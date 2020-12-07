@@ -53,27 +53,23 @@ func parse(s string) (map[string]string, error) {
 }
 
 func decode(args map[string]string, v reflect.Value) error {
-	for i := 0; i < v.NumField(); i++ {
-		tag := parseTag(v.Type().Field(i))
-		if tag.ignore {
-			continue
-		}
-
-		value, exists := args[tag.name]
-		if !exists && tag.required {
-			return newError(InvalidFormatError, fmt.Errorf("required key %s is missing", tag.name))
+	fields := parseFields(v)
+	for _, field := range fields {
+		value, exists := args[field.tags.name]
+		if !exists && field.tags.required {
+			return newError(InvalidFormatError, fmt.Errorf("required key %s is missing", field.tags.name))
 		}
 
 		if value == "" {
-			value = tag.defaultValue
+			value = field.tags.defaultValue
 			if value == "" {
 				continue
 			}
 		}
 
-		err := decodeField(v.Field(i), value)
+		err := decodeField(field.Value, value)
 		if err != nil {
-			return newError(InvalidFormatError, fmt.Errorf("decode value of field %s failed: %v", tag.name, err))
+			return newError(InvalidFormatError, fmt.Errorf("decode value of field %s failed: %v", field.tags.name, err))
 		}
 	}
 	return nil
