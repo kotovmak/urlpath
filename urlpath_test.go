@@ -9,13 +9,25 @@ import (
 
 func TestMarshal(t *testing.T) {
 	var expected = "" +
+		"/E3_key/E3_value/E4_key/E4_value" +
 		"/S3_key/S3_value/S4_key/S4_value" +
 		"/I2_key/0/I3_key/0/I4_key/4" +
 		"/U2_key/0/U3_key/0/U4_key/4" +
 		"/B2_key/false/B3_key/false/B4_key/true" +
 		"/Base64_key/QmFzZTY0X3ZhbHVl"
 
+	type Embeded struct {
+		E  string `urlpath:""`                        // without tag
+		E1 string `urlpath:"-"`                       // explicit ignored
+		E2 string `urlpath:"E2_key"`                  // zero-value
+		E3 string `urlpath:"E3_key;default=E3_value"` // zero-value with default option
+		E4 string `urlpath:"E4_key"`                  // non-zero-value
+		E5 string `urlpath:"E5_key;omitempty"`        // zero-value with omitempty
+	}
+
 	var example = struct {
+		Embeded
+
 		// string
 		S  string `urlpath:""`                        // without tag
 		S1 string `urlpath:"-"`                       // explicit ignored
@@ -47,7 +59,8 @@ func TestMarshal(t *testing.T) {
 		// custom
 		Base64 Base64 `urlpath:"Base64_key"`
 	}{
-		S: "S_value", S1: "S1_value", S4: "S4_value",
+		Embeded: Embeded{E: "E_value", E1: "E1_value", E4: "E4_value"},
+		S:       "S_value", S1: "S1_value", S4: "S4_value",
 		I: 12345, I1: 1, I4: 4,
 		U: 12345, U1: 1, U4: 4,
 		B: true, B1: true, B4: true,
@@ -135,13 +148,23 @@ func TestUnmasrshal(t *testing.T) {
 	})
 
 	t.Run("All values struct", func(t *testing.T) {
-		var example = "S2_key/S2_value" +
+		var example = "" +
+			"/E2_key/E2_value" +
+			"/S2_key/S2_value" +
 			"/I2_key/1/I3_key/0" +
 			"/U2_key/1/U3_key/0" +
 			"/B2_key/true/B3_key/false" +
 			"/Base64_key/QmFzZTY0X3ZhbHVl"
 
+		type Embeded struct {
+			E  string `urlpath:"E_key"`                   // not presented field
+			E1 string `urlpath:"E1_key;default=E1_value"` // not presented field with default
+			E2 string `urlpath:"E2_key"`                  // presented field
+		}
+
 		type model struct {
+			Embeded
+
 			// string
 			S  string `urlpath:"S_key"`                   // not presented field
 			S1 string `urlpath:"S1_key;default=S1_value"` // not presented field with default
@@ -166,6 +189,9 @@ func TestUnmasrshal(t *testing.T) {
 		}
 
 		var expected = model{
+			Embeded: Embeded{
+				E1: "E1_value", E2: "E2_value",
+			},
 			S1: "S1_value", S2: "S2_value",
 			I1: 1, I2: 1,
 			U1: 1, U2: 1,
