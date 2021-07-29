@@ -1,3 +1,3 @@
-module github.com/GreenHedgehog/urlpath
+module github.com/kotovmak/urlpath
 
 go 1.15
