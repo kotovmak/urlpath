@@ -66,6 +66,13 @@ func decode(args map[string]string, v reflect.Value) error {
 				continue
 			}
 		}
+		if len(field.tags.gt) > 0 {
+			intValue, _ := strconv.Atoi(value)
+			intGT, _ := strconv.Atoi(field.tags.gt)
+			if intValue <= intGT {
+				return newError(InvalidFormatError, fmt.Errorf("key %s must be biger than %s", field.tags.name, field.tags.gt))
+			}
+		}
 
 		err := decodeField(field.Value, value)
 		if err != nil {

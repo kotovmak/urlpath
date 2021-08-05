@@ -34,6 +34,7 @@ type tags struct {
 	omitempty    bool
 	name         string
 	defaultValue string
+	gt           string
 }
 
 func parseTag(field reflect.StructField) (t tags) {
@@ -54,6 +55,8 @@ func parseTag(field reflect.StructField) (t tags) {
 			t.omitempty = true
 		case strings.HasPrefix(keys[i], "default="):
 			t.defaultValue = strings.TrimPrefix(keys[i], "default=")
+		case strings.HasPrefix(keys[i], "gt="):
+			t.gt = strings.TrimPrefix(keys[i], "gt=")
 		}
 	}
 	return
