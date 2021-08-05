@@ -67,9 +67,9 @@ func decode(args map[string]string, v reflect.Value) error {
 			}
 		}
 		if len(field.tags.gt) > 0 {
-			intValue, _ := strconv.Atoi(value)
-			intGT, _ := strconv.Atoi(field.tags.gt)
-			if intValue <= intGT {
+			floatValue, _ := strconv.ParseFloat(value, 64)
+			floatGT, _ := strconv.ParseFloat(field.tags.gt, 64)
+			if floatValue <= floatGT {
 				return newError(InvalidFormatError, fmt.Errorf("key %s must be biger than %s", field.tags.name, field.tags.gt))
 			}
 		}
@@ -116,6 +116,18 @@ func decodeField(v reflect.Value, value string) error {
 			return err
 		}
 		v.SetUint(parsed)
+	case reflect.Float32:
+		parsed, err := strconv.ParseFloat(value, 32)
+		if err != nil {
+			return err
+		}
+		v.SetFloat(parsed)
+	case reflect.Float64:
+		parsed, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return err
+		}
+		v.SetFloat(parsed)
 	}
 	return nil
 }

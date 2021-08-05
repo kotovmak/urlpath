@@ -11,7 +11,7 @@ func TestMarshal(t *testing.T) {
 	var expected = "" +
 		"/E3_key/E3_value/E4_key/E4_value" +
 		"/S3_key/S3_value/S4_key/S4_value" +
-		"/I2_key/0/I3_key/0/I4_key/4/I6_key/2" +
+		"/I2_key/0/I3_key/0/I4_key/4/I6_key/2.2" +
 		"/U2_key/0/U3_key/0/U4_key/4" +
 		"/B2_key/false/B3_key/false/B4_key/true" +
 		"/Base64_key/QmFzZTY0X3ZhbHVl"
@@ -36,13 +36,13 @@ func TestMarshal(t *testing.T) {
 		S4 string `urlpath:"S4_key"`                  // non-zero-value
 		S5 string `urlpath:"S5_key;omitempty"`        // zero-value with omitempty
 		// int
-		I  int    `urlpath:""`                 // without tag
-		I1 int    `urlpath:"-"`                // explicit ignored
-		I2 int    `urlpath:"I2_key"`           // zero-value
-		I3 int    `urlpath:"I3_key;default=3"` // zero-value with default option
-		I4 int    `urlpath:"I4_key"`           // non-zero-value
-		I5 string `urlpath:"I5_key;omitempty"` // zero-value with omitempty
-		I6 int    `urlpath:"I6_key;gt=1"`
+		I  int     `urlpath:""`                 // without tag
+		I1 int     `urlpath:"-"`                // explicit ignored
+		I2 int     `urlpath:"I2_key"`           // zero-value
+		I3 int     `urlpath:"I3_key;default=3"` // zero-value with default option
+		I4 int     `urlpath:"I4_key"`           // non-zero-value
+		I5 string  `urlpath:"I5_key;omitempty"` // zero-value with omitempty
+		I6 float32 `urlpath:"I6_key;gt=1"`
 		// uint
 		U  uint   `urlpath:""`                 // without tag
 		U1 uint   `urlpath:"-"`                // explicit ignored
@@ -62,7 +62,7 @@ func TestMarshal(t *testing.T) {
 	}{
 		Embeded: Embeded{E: "E_value", E1: "E1_value", E4: "E4_value"},
 		S:       "S_value", S1: "S1_value", S4: "S4_value",
-		I: 12345, I1: 1, I4: 4, I6: 2,
+		I: 12345, I1: 1, I4: 4, I6: 2.2,
 		U: 12345, U1: 1, U4: 4,
 		B: true, B1: true, B4: true,
 		Base64: "Base64_value",
@@ -152,7 +152,7 @@ func TestUnmasrshal(t *testing.T) {
 		var example = "" +
 			"/E2_key/E2_value" +
 			"/S2_key/S2_value" +
-			"/I2_key/1/I3_key/0/I4_key/2" +
+			"/I2_key/1/I3_key/0/I4_key/2.2" +
 			"/U2_key/1/U3_key/0" +
 			"/B2_key/true/B3_key/false" +
 			"/Base64_key/QmFzZTY0X3ZhbHVl"
@@ -171,11 +171,11 @@ func TestUnmasrshal(t *testing.T) {
 			S1 string `urlpath:"S1_key;default=S1_value"` // not presented field with default
 			S2 string `urlpath:"S2_key"`                  // presented field
 			// int
-			I  int `urlpath:"I_key"`            // not presented field
-			I1 int `urlpath:"I1_key;default=1"` // not presented field with default
-			I2 int `urlpath:"I2_key"`           // presented field
-			I3 int `urlpath:"I3_key"`           // presented field with zero-value
-			I4 int `urlpath:"I4_key;gt=1"`
+			I  int     `urlpath:"I_key"`            // not presented field
+			I1 int     `urlpath:"I1_key;default=1"` // not presented field with default
+			I2 int     `urlpath:"I2_key"`           // presented field
+			I3 int     `urlpath:"I3_key"`           // presented field with zero-value
+			I4 float32 `urlpath:"I4_key;gt=1"`
 			// uint
 			U  int `urlpath:"U_key"`            // not presented field
 			U1 int `urlpath:"U1_key;default=1"` // not presented field with default
@@ -195,7 +195,7 @@ func TestUnmasrshal(t *testing.T) {
 				E1: "E1_value", E2: "E2_value",
 			},
 			S1: "S1_value", S2: "S2_value",
-			I1: 1, I2: 1, I4: 2,
+			I1: 1, I2: 1, I4: 2.2,
 			U1: 1, U2: 1,
 			B1: true, B2: true,
 			Base64: "Base64_value",
